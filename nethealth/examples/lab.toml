@@ -1,0 +1,24 @@
+# Lab-only sample. Point checks only at hosts and services you operate.
+# Do not use this tool to probe networks you do not own or administer.
+
+name = "lab"
+timeout_seconds = 3.0
+warn_tls_days = 14
+
+[[checks]]
+name = "loopback-ping"
+type = "icmp"
+host = "127.0.0.1"
+
+[[checks]]
+name = "localhost-a"
+type = "dns"
+query = "localhost"
+record = "A"
+
+# Uncomment if you run SSH locally and want a TCP example:
+# [[checks]]
+# name = "local-ssh"
+# type = "tcp"
+# host = "127.0.0.1"
+# port = 22

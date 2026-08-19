@@ -1,0 +1,12 @@
+{
+  "name": "json-suite",
+  "timeout_seconds": 2,
+  "checks": [
+    {
+      "name": "web",
+      "type": "http",
+      "url": "http://127.0.0.1:9/",
+      "expect_status": 200
+    }
+  ]
+}
