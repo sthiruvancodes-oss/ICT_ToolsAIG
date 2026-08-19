@@ -1,4 +1,4 @@
-# Sample suite. Loopback only. Don't point this at kit you don't look after.
+# Sample suite. Loopback only. Don't point this at kit
 
 name = "lab"
 timeout_seconds = 3.0
