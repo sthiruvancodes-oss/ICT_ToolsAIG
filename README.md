@@ -16,4 +16,4 @@ Next: IPAM / VLSM planner, config drift, Linux host audit, log triage, inventory
 
 ## Lab use only!!!
 
-Point every tool at systems you own or are authorised to operate. Please **DO NOT ** use them against third-party networks.
+Point every tool at systems you own or are authorised to operate. Please DO NOT use them against third-party networks.
