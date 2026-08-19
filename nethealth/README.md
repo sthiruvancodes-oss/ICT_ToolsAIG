@@ -1,14 +1,12 @@
 # nethealth
 
-Lab-safe ICMP, TCP, DNS, HTTP, and TLS checks with text, JSON, and HTML reports.
+I got tired of pinging a box, checking a port, looking up DNS, then going to find out when the cert expires, then pasting all of that into a ticket.
 
-Use this against hosts and services **you operate**. It is a monitoring helper, not a scanner.
-
-## Why
-
-A systems or network engineer needs a repeatable way to answer “is this service up, and is the certificate still valid?” before a change window — and a report that can go in a ticket. `nethealth` is a single CLI that does that from a TOML/JSON suite or one-off flags.
+`nethealth` does those checks from a TOML or JSON list, or from one-off flags. It prints a table, JSON, or an HTML file. Point it at hosts you actually operate. It is not a scanner.
 
 ## Install
+
+Python 3.11 or newer. No extra runtime packages. ICMP shells out to the system `ping`.
 
 ```bash
 cd nethealth
@@ -17,7 +15,9 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-## Quick start
+Windows: `.\.venv\Scripts\activate`.
+
+## Run it
 
 ```bash
 nethealth check --icmp 127.0.0.1 --dns localhost
@@ -26,18 +26,16 @@ nethealth check -c examples/lab.toml --format json
 nethealth check -c examples/lab.toml --format html -o report.html
 ```
 
-Requires Python 3.11 or newer (it uses the standard library `tomllib`).
+`--jobs` controls concurrency (default 8, `1` is sequential). `--timeout` overrides the suite timeout.
 
-Exit codes:
+Exit codes matter. Put this in cron or a change script and let it stop you.
 
 | Code | Meaning |
 | --- | --- |
-| `0` | all checks passed (skips allowed) |
-| `1` | one or more checks failed or errored |
-| `2` | usage or config error |
-| `130` | interrupted, or the output pipe closed early |
-
-The exit code is the point: drop `nethealth check -c prod.toml` into cron, a pipeline, or a change-window script and let it gate the next step.
+| `0` | everything passed (skips are fine) |
+| `1` | at least one check failed or errored |
+| `2` | bad flags or a broken suite file |
+| `130` | Ctrl-C, or the pipe closed |
 
 ## Suite file
 
@@ -77,11 +75,11 @@ port = 443
 warn_days = 14
 ```
 
-JSON suites are also accepted. Check types: `icmp`, `tcp`, `dns` (`A` or `AAAA`, optional `expect` address list), `http`, `tls`.
+JSON works too. Types: `icmp`, `tcp`, `dns` (`A` or `AAAA`, optional `expect` list of addresses), `http`, `tls`.
 
-Every check needs a unique `name`, because the name is what identifies the row in the report.
+Names have to be unique. The name is the row in the report.
 
-## Sample text report
+## What the text report looks like
 
 ```
 nethealth  cli  2026-08-19T06:08:37Z
@@ -93,37 +91,30 @@ PASS   dns-1   dns   localhost A     8.1ms  127.0.0.1
 FAILED  2 pass, 1 fail  (8.6ms)
 ```
 
-The JSON report carries the same data plus per-check `details` (resolved addresses, HTTP status, certificate expiry), so it can be shipped to a log collector or diffed between runs.
+JSON has the same rows plus extras: resolved addresses, HTTP status, cert expiry. Handy if you ship it to a log or diff two runs.
 
-## Architecture
+## How it is put together
 
-```
-CLI (argparse) → suite TOML/JSON or flags
-               → runner (optional thread pool)
-               → probes (stdlib only: ping, socket, urllib, ssl)
-               → text | JSON | HTML report
-```
+CLI reads a suite file or flags, runs the probes (optionally in a thread pool), then renders the report. ICMP is `ping`. Everything else is the standard library (`socket`, `urllib`, `ssl`). If `ping` is missing, that check is skipped instead of crashing.
 
-No runtime dependencies. ICMP uses the system `ping` binary and is skipped if it is not on `PATH`. Checks run concurrently by default, so a suite of slow-timeout targets finishes in about the time of the slowest one rather than the sum. Tests mock the network; they do not probe the public internet.
+Checks run at the same time by default, so a handful of slow timeouts takes about as long as the slowest one.
 
-## Known limits
+## Things it will not do
 
-Worth knowing before you trust a result:
+- **DNS timeouts.** `getaddrinfo` has no timeout. If the resolver wedges, that check can sit there past `timeout_seconds`. The answer is still right, it just might be late.
+- **HTTP follows redirects.** `expect_status` is the final page. A `301` to a healthy box looks like `200`.
+- **TLS verifies the chain.** Self-signed or an internal CA that is not in the trust store fails before expiry is even read. That is on purpose. Put the CA in the store if you care about the expiry warning.
+- **ICMP is whatever `ping` your OS shipped.** macOS, Linux and Windows flags are handled. Something else may fail in a confusing way.
 
-- **DNS timeouts are not enforced.** `socket.getaddrinfo` has no timeout parameter, so a wedged resolver can block a DNS check past `timeout_seconds`. The check is accurate, it is just not bounded.
-- **HTTP follows redirects.** `expect_status` is matched against the final response, so a `301` to a healthy page reads as `200`.
-- **TLS checks verify the chain.** An untrusted or self-signed certificate fails before expiry is ever read. That is deliberate, but it means an internal CA has to be in the trust store for the expiry warning to be useful.
-- **ICMP depends on the system `ping`.** Flag syntax differs per platform and is handled for macOS, Linux, and Windows. Anything else may report a parse-level failure rather than a network one.
+## HTTPS and TLS all fail with `CERTIFICATE_VERIFY_FAILED`
 
-## Troubleshooting
-
-**Every HTTPS and TLS check fails with `CERTIFICATE_VERIFY_FAILED ... unable to get local issuer certificate`.** The Python install has no CA trust store rather than the servers being broken. `nethealth` detects this and says so in the message. On a python.org macOS build, run the bundled installer once:
+Your Python has no CA bundle. The servers are probably fine. On a python.org macOS install, run this once:
 
 ```bash
 "/Applications/Python 3.12/Install Certificates.command"
 ```
 
-Otherwise point `SSL_CERT_FILE` at a CA bundle.
+Or set `SSL_CERT_FILE` to a CA bundle.
 
 ## Tests
 
@@ -131,4 +122,4 @@ Otherwise point `SSL_CERT_FILE` at a CA bundle.
 pytest
 ```
 
-63 tests, no network access required. They cover config validation and its rejection paths, each probe type via mocks, report rendering and HTML escaping, and CLI exit codes.
+63 tests. They mock the network, so they never hit the internet. They cover config validation (including the dumb rejection cases), each probe type, HTML escaping, and the CLI exit codes.

@@ -1,5 +1,4 @@
-# Lab-only sample. Point checks only at hosts and services you operate.
-# Do not use this tool to probe networks you do not own or administer.
+# Sample suite. Loopback only. Don't point this at kit you don't look after.
 
 name = "lab"
 timeout_seconds = 3.0
