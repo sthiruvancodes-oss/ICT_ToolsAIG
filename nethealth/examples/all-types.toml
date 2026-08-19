@@ -1,5 +1,5 @@
 # Every check type, aimed at loopback or invalid hosts so it is safe to open.
-# Several of these will fail if you actually run it. That is the point.
+
 
 name = "schema-reference"
 timeout_seconds = 2.0
