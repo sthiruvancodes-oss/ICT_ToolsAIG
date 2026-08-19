@@ -6,7 +6,9 @@ Use this against hosts and services **you operate**. It is a monitoring helper, 
 
 ## Why
 
-A systems or network engineer needs a repeatable way to answer “is this service up, and is the certificate still valid?” before a change window — and a report that can go in a ticket. `nethealth` is a single CLI that does that from a TOML/JSON suite or one-off flags.
+A systems or network engineer needs a repeatable way to answer “is this service up, and is the certificate still valid?” before a change window, and a report that can go in a ticket. 
+
+`nethealth` is a single CLI that does that from a TOML/JSON suite or one-off flags.
 
 ## Install
 
@@ -123,7 +125,7 @@ Worth knowing before you trust a result:
 "/Applications/Python 3.12/Install Certificates.command"
 ```
 
-Otherwise point `SSL_CERT_FILE` at a CA bundle.
+Otherwise, point `SSL_CERT_FILE` at a CA bundle.
 
 ## Tests
 
