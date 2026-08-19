@@ -14,8 +14,6 @@ htmlcov/
 .venv/
 venv/
 
-# Generated nethealth reports. These can contain internal hostnames and addresses,
-# so they are never committed.
 *.html
 report.json
 
