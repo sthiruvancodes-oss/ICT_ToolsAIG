@@ -2,7 +2,7 @@
 
 Small Python CLIs for systems and network admin work. Each tool is its own package, with tests and a README.
 
-Right now there is one:
+Right now, there is one:
 
 | Tool | What it does |
 | --- | --- |
