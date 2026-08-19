@@ -8,4 +8,4 @@ Right now there is one:
 | --- | --- |
 | [nethealth](nethealth/) | Ping, ports, DNS, HTTP and TLS. Prints a report. |
 
-More may show up later (IPAM, config drift, host audit). Don't point any of this at networks you don't look after.
+More may show up later (IPAM, config drift, host audit). Please do not point any of this at networks you don't look after.
