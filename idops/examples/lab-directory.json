@@ -1,0 +1,30 @@
+{
+  "tenant": "lab",
+  "groups": [
+    "All Staff",
+    "Finance",
+    "Operations",
+    "Warehouse",
+    "Disabled Users"
+  ],
+  "users": [
+    {
+      "upn": "sam@lab.example",
+      "display_name": "Sam Ortiz",
+      "department": "Finance",
+      "title": "Analyst",
+      "enabled": true,
+      "mfa": "enforced",
+      "groups": ["All Staff", "Finance"]
+    },
+    {
+      "upn": "pat@lab.example",
+      "display_name": "Pat Ng",
+      "department": "Warehouse",
+      "title": "Picker",
+      "enabled": true,
+      "mfa": "enforced",
+      "groups": ["All Staff", "Warehouse"]
+    }
+  ]
+}

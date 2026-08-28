@@ -1,0 +1,4 @@
+action,upn,display_name,department,title,groups,mfa_required
+joiner,alex@lab.example,Alex Chen,Finance,Analyst,All Staff;Finance,true
+mover,sam@lab.example,Sam Ortiz,Operations,Supervisor,All Staff;Operations,true
+leaver,pat@lab.example,Pat Ng,Warehouse,Picker,,

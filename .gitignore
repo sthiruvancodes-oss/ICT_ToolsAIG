@@ -13,9 +13,13 @@ build/
 htmlcov/
 .venv/
 venv/
+.pdf_vendor/
 
 *.html
 report.json
+
+# Editor
+.cursor/
 
 # OS and editor
 .DS_Store
